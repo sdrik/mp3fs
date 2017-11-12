@@ -448,4 +448,12 @@ const Mp3Encoder::meta_map_t Mp3Encoder::metatag_map {
     {METATAG_ALBUMARTIST, "TPE2"},
     {METATAG_ENCODER, "TSSE"},
     {METATAG_TRACKLENGTH, "TLEN"},
+    {METATAG_MUSICBRAINZ_ALBUM_ARTIST_ID, "TXXX:MusicBrainz Album Artist Id"},
+    {METATAG_MUSICBRAINZ_ALBUM_ID, "TXXX:MusicBrainz Album Id"},
+    {METATAG_MUSICBRAINZ_RELEASE_COUNTRY, "TXXX:MusicBrainz Album Release Country"},
+    {METATAG_MUSICBRAINZ_ALBUM_STATUS, "TXXX:MusicBrainz Album Status"},
+    {METATAG_MUSICBRAINZ_ALBUM_TYPE, "TXXX:MusicBrainz Album Type"},
+    {METATAG_MUSICBRAINZ_ARTIST_ID, "TXXX:MusicBrainz Artist Id"},
+    {METATAG_MUSICBRAINZ_RELEASE_GROUP_ID, "TXXX:MusicBrainz Release Group Id"},
+    {METATAG_MUSICBRAINZ_TRACK_ID, "UFID:http://musicbrainz.org"},
 };
