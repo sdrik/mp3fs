@@ -6,7 +6,7 @@ get_metadata() {
     python3 <<END
 import mutagen
 file = mutagen.File('$1')
-tags = ['%s=%s' % (k, v) for k, v in file.tags.items() if k[0] == 'T']
+tags = ['%s=%s' % (k, v) for k, v in file.tags.items() if k[0] == 'T' or k.startswith('UFID')]
 print('\n'.join(sorted(tags)))
 END
 }
@@ -22,6 +22,14 @@ TPE1=Barack Obama
 TPOS=0/0
 TRCK=1/1
 TSSE=MP3FS
+TXXX:MusicBrainz Album Artist Id=368fc319-4815-44f9-9933-40572f1b6844
+TXXX:MusicBrainz Album Id=7663f268-ff12-4ed7-b4f6-4d1ad00c40bf
+TXXX:MusicBrainz Album Release Country=US
+TXXX:MusicBrainz Album Status=Bootleg
+TXXX:MusicBrainz Album Type=Other
+TXXX:MusicBrainz Artist Id=326cc352-ff9a-4f43-ab3d-d396ccbff3e7
+TXXX:MusicBrainz Release Group Id=158e187b-0563-494a-a6d4-46d95e83ee29
+UFID:http://musicbrainz.org=UFID(owner='http://musicbrainz.org', data=b'a50f3899-fb64-43a1-a33c-f1d1687a98bb')
 END
 
 cmp -s - <(get_metadata "$DIRNAME/raven.mp3") <<END
@@ -29,8 +37,16 @@ TALB=The Raven
 TCON=Speech
 TDRC=2007
 TIT2=the_raven
-TLEN=20970
+TLEN=21002
 TPE1=Edgar Allen Poe
 TRCK=01
 TSSE=MP3FS
+TXXX:MusicBrainz Album Artist Id=368fc319-4815-44f9-9933-40572f1b6844
+TXXX:MusicBrainz Album Id=7663f268-ff12-4ed7-b4f6-4d1ad00c40bf
+TXXX:MusicBrainz Album Release Country=US
+TXXX:MusicBrainz Album Status=Bootleg
+TXXX:MusicBrainz Album Type=Other
+TXXX:MusicBrainz Artist Id=326cc352-ff9a-4f43-ab3d-d396ccbff3e7
+TXXX:MusicBrainz Release Group Id=158e187b-0563-494a-a6d4-46d95e83ee29
+UFID:http://musicbrainz.org=UFID(owner='http://musicbrainz.org', data=b'a50f3899-fb64-43a1-a33c-f1d1687a98bb')
 END
