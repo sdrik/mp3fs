@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <sstream>
 #include <vector>
 
@@ -134,20 +135,78 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
     meta_map_t::const_iterator it = metatag_map.find(key);
 
     if (it != metatag_map.end()) {
-        struct id3_frame* frame = id3_tag_findframe(id3tag, it->second, 0);
-        if (!frame) {
-            frame = id3_frame_new(it->second);
-            id3_tag_attachframe(id3tag, frame);
+        struct id3_frame* frame;
+        const char *frametype = 0;
+        const char *subkey = 0;
+        size_t subkey_len;
+        id3_ucs4_t *ucs4 = 0;
 
-            id3_field_settextencoding(id3_frame_field(frame, 0),
-                                      ID3_FIELD_TEXTENCODING_UTF_8);
+        if (std::strncmp(it->second, "TXXX:", 5) == 0) {
+            frametype = "TXXX";
+            subkey = it->second + 5;
+            subkey_len = (1 + std::strlen(subkey)) * sizeof(id3_ucs4_t);
+            id3_ucs4_t *description = id3_utf8_ucs4duplicate((id3_utf8_t *)subkey);
+            for (int i = 0;; i++) {
+                frame = id3_tag_findframe(id3tag, frametype, i);
+                if (frame) {
+                    const id3_ucs4_t *ucs4 = id3_field_getstring(id3_frame_field(frame, 1));
+                    if (ucs4 && std::memcmp(ucs4, description, subkey_len) == 0)
+                        break;
+                } else {
+                    break;
+                }
+            }
+            if (!frame) {
+                frame = id3_frame_new(frametype);
+                id3_tag_attachframe(id3tag, frame);
+
+                id3_field_settextencoding(id3_frame_field(frame, 0),
+                                          ID3_FIELD_TEXTENCODING_UTF_8);
+                id3_field_setstring(id3_frame_field(frame, 1), description);
+            }
+            ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
+            if (ucs4) {
+                id3_field_setstring(id3_frame_field(frame, 2), ucs4);
+                free(ucs4);
+            }
+            free(description);
+        } else if (std::strncmp(it->second, "UFID:", 5) == 0) {
+            frametype = "UFID";
+            subkey = it->second + 5;
+            subkey_len = 1 + std::strlen(subkey);
+            for (int i = 0;; i++) {
+                frame = id3_tag_findframe(id3tag, frametype, i);
+                if (frame) {
+                    const id3_latin1_t *lat1 = id3_field_getlatin1(id3_frame_field(frame, 0));
+                    if (lat1 && std::strncmp((const char *)lat1, subkey, subkey_len) == 0)
+                        break;
+                } else {
+                    break;
+                }
+            }
+            if (!frame) {
+                frame = id3_frame_new(frametype);
+                id3_tag_attachframe(id3tag, frame);
+                id3_field_setlatin1(id3_frame_field(frame, 0), (const id3_latin1_t *)subkey);
+            }
+            id3_field_setbinarydata(id3_frame_field(frame, 1), (const id3_byte_t *)value, std::strlen(value));
+        } else {
+            frametype = it->second;
+            frame = id3_tag_findframe(id3tag, frametype, 0);
+            if (!frame) {
+                frame = id3_frame_new(frametype);
+                id3_tag_attachframe(id3tag, frame);
+
+                id3_field_settextencoding(id3_frame_field(frame, 0),
+                                          ID3_FIELD_TEXTENCODING_UTF_8);
+            }
+            ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
+            if (ucs4) {
+                id3_field_addstring(id3_frame_field(frame, 1), ucs4);
+                free(ucs4);
+            }
         }
 
-        id3_ucs4_t* ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
-        if (ucs4) {
-            id3_field_addstring(id3_frame_field(frame, 1), ucs4);
-            free(ucs4);
-        }
     /* Special handling for track or disc numbers. */
     } else if (key == METATAG_TRACKNUMBER || key == METATAG_TRACKTOTAL
                || key == METATAG_DISCNUMBER || key == METATAG_DISCTOTAL) {
