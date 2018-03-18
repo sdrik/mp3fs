@@ -19,6 +19,7 @@
  */
 
 #include "codecs/flac_decoder.h"
+#include "mp3fs.h"
 
 #include <algorithm>
 #include <fcntl.h>
@@ -159,6 +160,10 @@ void FlacDecoder::metadata_callback(const FLAC__StreamMetadata* metadata) {
                 meta_map_t::const_iterator it = metatag_map.find(fname);
                 if (it != metatag_map.end()) {
                     encoder_c->set_text_tag(it->second, comment.get_field_value());
+                } else if (params.gainmode == 0) {
+                    it = rgtag_map.find(fname);
+                    if (it != rgtag_map.end())
+                        encoder_c->set_text_tag(it->second, comment.get_field_value());
                 } else if (fname == "REPLAYGAIN_REFERENCE_LOUDNESS") {
                     gainref = atof(comment.get_field_value());
                 } else if (fname == "REPLAYGAIN_ALBUM_GAIN") {
@@ -244,4 +249,15 @@ const FlacDecoder::meta_map_t FlacDecoder::metatag_map = {
     {"MUSICBRAINZ_ARTISTID", METATAG_MUSICBRAINZ_ARTIST_ID},
     {"MUSICBRAINZ_RELEASEGROUPID", METATAG_MUSICBRAINZ_RELEASE_GROUP_ID},
     {"MUSICBRAINZ_TRACKID", METATAG_MUSICBRAINZ_TRACK_ID},
+};
+
+/*
+ * This map associates FLAC values to the standard values for replaygain tags.
+ */
+const FlacDecoder::meta_map_t FlacDecoder::rgtag_map = {
+    {"REPLAYGAIN_REFERENCE_LOUDNESS", METATAG_REPLAYGAIN_REFERENCE_LOUDNESS},
+    {"REPLAYGAIN_ALBUM_GAIN", METATAG_REPLAYGAIN_ALBUM_GAIN},
+    {"REPLAYGAIN_ALBUM_PEAK", METATAG_REPLAYGAIN_ALBUM_PEAK},
+    {"REPLAYGAIN_TRACK_GAIN", METATAG_REPLAYGAIN_TRACK_GAIN},
+    {"REPLAYGAIN_TRACK_PEAK", METATAG_REPLAYGAIN_TRACK_PEAK},
 };

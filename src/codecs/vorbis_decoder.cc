@@ -19,6 +19,7 @@
  */
 
 #include "vorbis_decoder.h"
+#include "mp3fs.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -150,6 +151,12 @@ int VorbisDecoder::process_metadata(Encoder* encoder) {
         if (it != metatag_map.end()) {
             encoder->set_text_tag(it->second, tagvalue.c_str());
         }
+        else if (params.gainmode == 0) {
+            it = rgtag_map.find(tagname);
+            if (it != rgtag_map.end()) {
+                encoder->set_text_tag(it->second, tagvalue.c_str());
+            }
+        }
         else if (tagname == "METADATA_BLOCK_PICTURE") {
             char* data;
             size_t data_len;
@@ -268,4 +275,12 @@ const VorbisDecoder::meta_map_t VorbisDecoder::metatag_map = {
     {"MUSICBRAINZ_ARTISTID", METATAG_MUSICBRAINZ_ARTIST_ID},
     {"MUSICBRAINZ_RELEASEGROUPID", METATAG_MUSICBRAINZ_RELEASE_GROUP_ID},
     {"MUSICBRAINZ_TRACKID", METATAG_MUSICBRAINZ_TRACK_ID},
+};
+
+const VorbisDecoder::meta_map_t VorbisDecoder::rgtag_map = {
+    {"REPLAYGAIN_REFERENCE_LOUDNESS", METATAG_REPLAYGAIN_REFERENCE_LOUDNESS},
+    {"REPLAYGAIN_ALBUM_GAIN", METATAG_REPLAYGAIN_ALBUM_GAIN},
+    {"REPLAYGAIN_ALBUM_PEAK", METATAG_REPLAYGAIN_ALBUM_PEAK},
+    {"REPLAYGAIN_TRACK_GAIN", METATAG_REPLAYGAIN_TRACK_GAIN},
+    {"REPLAYGAIN_TRACK_PEAK", METATAG_REPLAYGAIN_TRACK_PEAK},
 };
