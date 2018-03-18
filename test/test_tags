@@ -1,5 +1,6 @@
 #!/bin/bash
 
+MP3FS_EXTRA_ARGS="--gainmode=0"
 . "${BASH_SOURCE%/*}/funcs.sh"
 
 get_metadata() {
@@ -29,6 +30,11 @@ TXXX:MusicBrainz Album Status=Bootleg
 TXXX:MusicBrainz Album Type=Other
 TXXX:MusicBrainz Artist Id=326cc352-ff9a-4f43-ab3d-d396ccbff3e7
 TXXX:MusicBrainz Release Group Id=158e187b-0563-494a-a6d4-46d95e83ee29
+TXXX:REPLAYGAIN_ALBUM_GAIN=+3.72 dB
+TXXX:REPLAYGAIN_ALBUM_PEAK=0.35464478
+TXXX:REPLAYGAIN_REFERENCE_LOUDNESS=89.0 dB
+TXXX:REPLAYGAIN_TRACK_GAIN=+3.72 dB
+TXXX:REPLAYGAIN_TRACK_PEAK=0.35464478
 UFID:http://musicbrainz.org=UFID(owner='http://musicbrainz.org', data=b'a50f3899-fb64-43a1-a33c-f1d1687a98bb')
 END
 
@@ -48,5 +54,9 @@ TXXX:MusicBrainz Album Status=Bootleg
 TXXX:MusicBrainz Album Type=Other
 TXXX:MusicBrainz Artist Id=326cc352-ff9a-4f43-ab3d-d396ccbff3e7
 TXXX:MusicBrainz Release Group Id=158e187b-0563-494a-a6d4-46d95e83ee29
+TXXX:REPLAYGAIN_ALBUM_GAIN=+1.08 dB
+TXXX:REPLAYGAIN_ALBUM_PEAK=0.58668917
+TXXX:REPLAYGAIN_TRACK_GAIN=+1.08 dB
+TXXX:REPLAYGAIN_TRACK_PEAK=0.58668917
 UFID:http://musicbrainz.org=UFID(owner='http://musicbrainz.org', data=b'a50f3899-fb64-43a1-a33c-f1d1687a98bb')
 END
