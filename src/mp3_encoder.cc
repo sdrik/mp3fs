@@ -138,19 +138,21 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
 
     if (it != metatag_map.end()) {
         struct id3_frame* frame;
-        id3_ucs4_t *description = 0;
         const char *frametype = 0;
+        const char *subkey = 0;
+        size_t subkey_len;
+        id3_ucs4_t *ucs4 = 0;
 
         if (std::strncmp(it->second, "TXXX:", 5) == 0) {
             frametype = "TXXX";
-            const char *desc_utf8 = it->second + 5;
-            description = id3_utf8_ucs4duplicate((id3_utf8_t *)desc_utf8);
-            id3_length_t desc_len = (1 + strlen(desc_utf8)) * 4;
+            subkey = it->second + 5;
+            subkey_len = (1 + std::strlen(subkey)) * 4;
+            id3_ucs4_t *description = id3_utf8_ucs4duplicate((id3_utf8_t *)subkey);
             for (int i = 0;; i++) {
                 frame = id3_tag_findframe(id3tag, frametype, i);
                 if (frame) {
                     const id3_ucs4_t *ucs4 = id3_field_getstring(id3_frame_field(frame, 1));
-                    if (ucs4 && std::memcmp(ucs4, description, desc_len) == 0)
+                    if (ucs4 && std::memcmp(ucs4, description, subkey_len) == 0)
                         break;
                 } else {
                     break;
@@ -164,7 +166,7 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
                                           ID3_FIELD_TEXTENCODING_UTF_8);
                 id3_field_setstring(id3_frame_field(frame, 1), description);
             }
-            id3_ucs4_t* ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
+            ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
             if (ucs4) {
                 id3_field_setstring(id3_frame_field(frame, 2), ucs4);
                 free(ucs4);
@@ -172,13 +174,13 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
             free(description);
         } else if (std::strncmp(it->second, "UFID:", 5) == 0) {
             frametype = "UFID";
-            const char *owner_id = it->second + 5;
-            size_t owner_len = strlen(owner_id);
+            subkey = it->second + 5;
+            subkey_len = 1 + std::strlen(subkey);
             for (int i = 0;; i++) {
                 frame = id3_tag_findframe(id3tag, frametype, i);
                 if (frame) {
                     const id3_latin1_t *lat1 = id3_field_getlatin1(id3_frame_field(frame, 0));
-                    if (lat1 && std::strncmp((const char *)lat1, owner_id, owner_len) == 0)
+                    if (lat1 && std::strncmp((const char *)lat1, subkey, subkey_len) == 0)
                         break;
                 } else {
                     break;
@@ -187,9 +189,9 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
             if (!frame) {
                 frame = id3_frame_new(frametype);
                 id3_tag_attachframe(id3tag, frame);
-                id3_field_setlatin1(id3_frame_field(frame, 0), (const id3_latin1_t *)owner_id);
+                id3_field_setlatin1(id3_frame_field(frame, 0), (const id3_latin1_t *)subkey);
             }
-            id3_field_setbinarydata(id3_frame_field(frame, 1), (const id3_byte_t *)value, strlen(value) + 1);
+            id3_field_setbinarydata(id3_frame_field(frame, 1), (const id3_byte_t *)value, std::strlen(value) + 1);
         } else {
             frametype = it->second;
             frame = id3_tag_findframe(id3tag, frametype, 0);
@@ -200,7 +202,7 @@ void Mp3Encoder::set_text_tag(const int key, const char* value) {
                 id3_field_settextencoding(id3_frame_field(frame, 0),
                                           ID3_FIELD_TEXTENCODING_UTF_8);
             }
-            id3_ucs4_t* ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
+            ucs4 = id3_utf8_ucs4duplicate((id3_utf8_t *)value);
             if (ucs4) {
                 id3_field_addstring(id3_frame_field(frame, 1), ucs4);
                 free(ucs4);
