@@ -109,7 +109,7 @@ Encoding options:\n\
                            320; 128 is the default\n\
     --gainmode=<0,1,2>, -ogainmode=<0,1,2>\n\
                            what to do with ReplayGain tags:\n\
-                           0 - ignore, 1 - prefer album gain (default),\n\
+                           0 - ignore/passthrough, 1 - prefer album gain (default),\n\
                            2 - prefer track gain\n\
     --gainref=REF, -ogainref=REF\n\
                            reference value to use for ReplayGain in \n\
