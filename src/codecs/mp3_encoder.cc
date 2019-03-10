@@ -235,6 +235,7 @@ int Mp3Encoder::render_tag() {
      * Some players = iTunes
      */
     id3_tag_options(id3tag, ID3_TAG_OPTION_COMPRESSION, 0);
+    id3_tag_options(id3tag, ID3_TAG_OPTION_CRC, params.crc);
     id3_tag_setlength(id3tag, id3_tag_render(id3tag, nullptr) + 12);
 
     // write v2 tag

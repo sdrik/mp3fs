@@ -1,0 +1,68 @@
+#!/bin/bash
+
+. "${BASH_SOURCE%/*}/funcs.sh"
+
+check_crc() {
+	python3 <<END
+from sys import exit
+from binascii import crc32
+
+def synchsafe(bytes):
+    rtn = 0
+    for i in range(len(bytes)):
+        rtn = rtn << 7
+        rtn += bytes[i]
+    return rtn
+
+with open('$1', 'rb') as f:
+
+    # Skip "ID3" and major/minor bytes
+    f.seek(5)
+
+    # Read flags
+    flags = f.read(1)[0]
+
+    # If extended header is not present, CRC is not present
+    if not flags & 0x40:
+        exit(1)
+
+    # Get tag size (excluding standard header)
+    tag_size = synchsafe(f.read(4))
+
+    # Get extended header size
+    ext_size = synchsafe(f.read(4))
+
+    # Skip extended flag size
+    f.seek(1, 1)
+
+    # Get extended flags
+    ext_flags = f.read(1)[0]
+
+    # Fail if CRC is not present
+    if not ext_flags & 0x20:
+        exit(1)
+
+    # Skip "IsUpdate" flag size if present
+    if ext_flags & 0x40:
+        f.seek(1, 1)
+
+    # Skip CRC flag size (always 5)
+    f.seek(1, 1)
+
+    # Get CRC value
+    file_crc = synchsafe(f.read(5))
+
+    # Skip to end of extended header
+    f.seek(10 + ext_size)
+
+    # Compute the CRC value on the remaining tag data
+    computed_crc = crc32(f.read(tag_size - ext_size))
+
+    # Compare computed value with the read one
+    if file_crc != computed_crc:
+        exit(1)
+END
+}
+
+check_crc "$DIRNAME/obama.mp3"
+check_crc "$DIRNAME/raven.mp3"

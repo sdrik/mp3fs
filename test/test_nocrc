@@ -1,0 +1,42 @@
+#!/bin/bash
+
+MP3FS_EXTRA_ARGS="--nocrc"
+. "${BASH_SOURCE%/*}/funcs.sh"
+
+check_nocrc() {
+	python3 <<END
+from sys import exit
+
+def synchsafe(bytes):
+    rtn = 0
+    for i in range(len(bytes)):
+        rtn = rtn << 7
+        rtn += bytes[i]
+    return rtn
+
+with open('$1', 'rb') as f:
+
+    # Skip "ID3" and major/minor bytes
+    f.seek(5)
+
+    # Read flags
+    flags = f.read(1)[0]
+
+    # If extended header is not present, CRC is not present
+    if not flags & 0x40:
+        exit(0)
+
+    # Skip tag size, extended header size and extended flag size
+    f.seek(9, 1)
+
+    # Get extended flags
+    ext_flags = f.read(1)[0]
+
+    # Fail if CRC is present
+    if ext_flags & 0x20:
+        exit(1)
+END
+}
+
+check_nocrc "$DIRNAME/obama.mp3"
+check_nocrc "$DIRNAME/raven.mp3"
