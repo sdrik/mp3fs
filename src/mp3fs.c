@@ -41,6 +41,7 @@ struct mp3fs_params params = {
     .quality         = 5,
     .statcachesize   = 0,
     .vbr             = 0,
+    .crc             = ~0,
 #ifdef HAVE_MP3
     .desttype  = "mp3",
 #endif
@@ -79,6 +80,8 @@ static struct fuse_opt mp3fs_opts[] = {
     MP3FS_OPT("statcachesize=%u",     statcachesize, 0),
     MP3FS_OPT("--vbr",                vbr, 1),
     MP3FS_OPT("vbr",                  vbr, 1),
+    MP3FS_OPT("--nocrc",              crc, 0),
+    MP3FS_OPT("nocrc",                crc, 0),
 
     FUSE_OPT_KEY("-h",                KEY_HELP),
     FUSE_OPT_KEY("--help",            KEY_HELP),
@@ -130,6 +133,7 @@ Encoding options:\n\
                            bit rate set with '-b' sets the maximum bit rate.\n\
                            Performance will be terrible unless the\n\
                            statcachesize is enabled.\n\
+    --nocrc, -onocrc       Disable adding a CRC in the extended header.\n\
 \n\
 General options:\n\
     -h, --help             display this help and exit\n\
@@ -241,6 +245,7 @@ int main(int argc, char *argv[]) {
                 "quality:        %u\n"
                 "statcachesize:  %u\n"
                 "vbr:            %u\n"
+                "crc:            %u\n"
                 ,
                 params.basepath,
                 params.bitrate,
@@ -253,7 +258,8 @@ int main(int argc, char *argv[]) {
                 params.logfile,
                 params.quality,
                 params.statcachesize,
-                params.vbr);
+                params.vbr,
+                params.crc);
 
     // start FUSE
     ret = fuse_main(args.argc, args.argv, &mp3fs_ops, NULL);

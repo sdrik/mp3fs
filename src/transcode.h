@@ -42,6 +42,7 @@ extern struct mp3fs_params {
     unsigned int quality;
     unsigned int statcachesize;
     int vbr;
+    int crc;
 } params;
 
 /* Fuse operations struct */
