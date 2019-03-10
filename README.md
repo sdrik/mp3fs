@@ -1,7 +1,7 @@
 mp3fs
 =====
 
-[![Build Status](https://travis-ci.org/khenriks/mp3fs.svg?branch=master)](https://travis-ci.org/khenriks/mp3fs)
+[![Build Status](https://travis-ci.org/sdrik/mp3fs.svg?branch=mp3fs-master)](https://travis-ci.org/sdrik/mp3fs)
 
 Web site: http://khenriks.github.io/mp3fs/
 
